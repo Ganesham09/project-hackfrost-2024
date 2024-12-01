@@ -1,0 +1,20 @@
+name: translation-workflow
+tasks:
+  - id: detect-language
+    type: io.kestra.plugin.ai.languagedetection
+    inputs:
+      text: "{{ inputs.text }}"
+
+  - id: translate-text
+    type: io.kestra.plugin.ai.translation
+    inputs:
+      text: "{{ inputs.text }}"
+      sourceLanguage: "{{ outputs.detect-language.language }}"
+      targetLanguage: "{{ inputs.targetLanguage }}"
+
+triggers:
+  - id: api-trigger
+    type: io.kestra.core.models.triggers.types.WebhookTrigger
+    conditions:
+      - type: io.kestra.core.models.conditions.types.ExecutionFlowCondition
+        flow: translation-workflow
